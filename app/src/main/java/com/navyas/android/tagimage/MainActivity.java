@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        
         //setting icon on actionBar
         getSupportActionBar().setLogo(R.drawable.ic_launcher);
 
