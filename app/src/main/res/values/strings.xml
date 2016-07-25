@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Image Tag</string>
+    <string name="app_name">FindMyPic</string>
 
 
     <string name="action_settings">Settings</string>
@@ -12,9 +12,7 @@
     <string name="action_search">Search</string>
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
-
-
-
+    <string name="search">Search</string>
 
 
 </resources>

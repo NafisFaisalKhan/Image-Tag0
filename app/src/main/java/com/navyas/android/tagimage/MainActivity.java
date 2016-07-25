@@ -18,7 +18,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
@@ -35,9 +37,8 @@ public class MainActivity extends AppCompatActivity {
     private Cursor cursor;
     private static int columnIndex;
     private static final String[] proj = {MediaStore.Images.Media.DATA};
-    public static final String ClientId = "-0tf0EPVrK7qaqFM5mGSr5x6RGfxTfYj2HuBRQ3O";
-    public static final String ClientSecret = "s7ZGulJ7JNJZaBsNkZtWmk0Rrhi4W7xAyiGCiQjO";
-    private static String[] tagName = new String[20];
+    public static final String ClientId = "id";
+    public static final String ClientSecret = "secret";
     public static List<String> string = new ArrayList<String>();
     private static List<File> files = new ArrayList<>();
     private static List<String> grid = new ArrayList<>();
@@ -51,10 +52,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        
-        //setting icon on actionBar
-        getSupportActionBar().setLogo(R.drawable.ic_launcher);
-
+        android.support.v7.app.ActionBar menu = getSupportActionBar();
+        menu.setDisplayShowHomeEnabled(true);
+        menu.setLogo(R.mipmap.ic_launcher);
+        menu.setDisplayUseLogoEnabled(true);
+        menu.setTitle("");
 
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -145,19 +147,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getData() {
-        string.clear();
-        cursor = managedQuery(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, proj, null, null, MediaStore.Images.Media.DEFAULT_SORT_ORDER);
-        columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        string.add(cursor.getString(columnIndex));
-        while (cursor.moveToNext()) {
+        try {
+            string.clear();
+            cursor = managedQuery(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, proj, null, null, MediaStore.Images.Media.DEFAULT_SORT_ORDER);
+            columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
             string.add(cursor.getString(columnIndex));
+            while (cursor.moveToNext()) {
+                string.add(cursor.getString(columnIndex));
+            }
+
+            for (String attr : string) {
+                File file = new File(attr);
+                files.add(file);
+            }
+        }
+        catch (Exception e){
+            Toast.makeText(this, "No images found", Toast.LENGTH_LONG).show();
         }
 
-        for (String attr : string) {
-            File file = new File(attr);
-            files.add(file);
-        }
     }
 
 
@@ -189,12 +197,13 @@ public class MainActivity extends AppCompatActivity {
 
         int id = item.getItemId();
 
-        if (id == R.id.action_delete) {
+        //For Debugging
+       /* if (id == R.id.action_delete) {
             ClarifaiDbHelper mDbHelper = new ClarifaiDbHelper(this);
             SQLiteDatabase db = mDbHelper.getWritableDatabase();
             db.delete(ClarifaiContract.DataEntry.TABLE_NAME, null, null);
             return true;
-        }
+        }*/
 
         if (id == R.id.action_resync) {
             stop = 0;
@@ -257,6 +266,14 @@ public class MainActivity extends AppCompatActivity {
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.
+                INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        return true;
     }
 
 
